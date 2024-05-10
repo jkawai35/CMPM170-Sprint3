@@ -4,7 +4,14 @@ using UnityEngine;
 
 public class PlayerManager : MonoBehaviour //Script is based on Code Class - 2D Player Movement in Unity: https://www.youtube.com/watch?v=0-c3ErDzrh8
 {
+
+    enum PlayerState {Idle, Move, Jump} //The set of states for an FSM
+
+    PlayerState currentState;
+    private bool currentStateCompleted;
+
     [SerializeField] private Rigidbody2D rb;
+    //[SerializeField] private Animator animator; FOR WHEN ANIMATIONS ARE ADDED
     [SerializeField] private float playerMoveSpeed, playerJumpSpeed, playerAcceleration;
     [Range(0f, 1f)] [SerializeField] private float playerDrag;
     [SerializeField] private BoxCollider2D groundCheckCollider;
@@ -28,6 +35,11 @@ public class PlayerManager : MonoBehaviour //Script is based on Code Class - 2D 
         if(Input.GetKey(KeyCode.J) && isGrounded){ //Player will jump if J is down
             playerJump();
         }
+
+        if(currentStateCompleted == true){
+            DetermineNewState();
+        }
+        UpdateState();
     }
 
     //Fixed Update is called at specific rates defined by the Unity editor
@@ -35,6 +47,67 @@ public class PlayerManager : MonoBehaviour //Script is based on Code Class - 2D 
         checkIfGrounded();
         implementFriction();
         movePlayer();
+    }
+
+    private void DetermineNewState(){
+        currentStateCompleted = false;
+        if(isGrounded == true){ //Determining current state
+            if(horizontalMovement == 0){
+                currentState = PlayerState.Idle;
+                StartIdleState(); //Calling Entry Function
+            } else{
+                currentState = PlayerState.Move;
+                StartMoveState();
+            }
+        } else{
+            currentState = PlayerState.Jump;
+            StartJumpState();
+        }
+    }
+
+    void UpdateState(){
+        switch (currentState){
+            case PlayerState.Idle:
+                UpdateIdle();
+                break;
+            case PlayerState.Move:
+                UpdateMove();
+                break;
+            case PlayerState.Jump:
+                UpdateJump();
+                break;
+        }
+    }
+
+    private void StartIdleState(){
+        //animator.Play("Idle"); FOR ANIMATOR
+    }
+
+    private void UpdateIdle(){
+        if(horizontalMovement != 0){ //Exit conditions
+            currentStateCompleted = true;
+        }
+    }
+
+    private void StartMoveState(){
+        //animator.Play("Move"); FOR ANIMATOR
+    }
+
+    private void UpdateMove(){
+        if(horizontalMovement == 0 || !isGrounded){
+            currentState = PlayerState.Idle;
+            currentStateCompleted = true;
+        }
+    }
+
+    private void StartJumpState(){
+        //animator.Play("Jump"); FOR ANIMATOR
+    }
+
+    private void UpdateJump(){
+        if(isGrounded){
+            currentStateCompleted = true;
+        }
     }
 
     private void getPlayerInput(){ //Adjusts horizontal movement force depending on player input
