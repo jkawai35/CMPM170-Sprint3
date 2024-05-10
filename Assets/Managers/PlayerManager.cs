@@ -4,11 +4,10 @@ using UnityEngine;
 
 public class PlayerManager : MonoBehaviour //Script is based on Code Class - 2D Player Movement in Unity: https://www.youtube.com/watch?v=0-c3ErDzrh8
 {
-
-    enum PlayerState {Idle, Move, Jump} //The set of states for an FSM
-
+    //PLAYER MANAGER VARIABLES
+    enum PlayerState {Idle, Move, Jump, Fire} //The set of states for an FSM
     PlayerState currentState;
-    private bool currentStateCompleted;
+    private bool currentStateCompleted; //Boolean value to determine when to start new state
 
     [SerializeField] private Rigidbody2D rb;
     //[SerializeField] private Animator animator; FOR WHEN ANIMATIONS ARE ADDED
@@ -16,27 +15,32 @@ public class PlayerManager : MonoBehaviour //Script is based on Code Class - 2D 
     [Range(0f, 1f)] [SerializeField] private float playerDrag;
     [SerializeField] private BoxCollider2D groundCheckCollider;
     [SerializeField] private LayerMask groundMask;
-    private float horizontalMovement, moveIncrement, totalHorizontalSpeed;
-    private bool isGrounded;
+    private float horizontalMovement, moveIncrement, totalHorizontalSpeed, firingCounter;
+    private bool isGrounded, isFiring;
+    private string direction;
 
-    // Start is called before the first frame update
+    //INITIAL FUNCTIONS
     void Start()
     {
         playerMoveSpeed = 5f;
         playerJumpSpeed = 7.5f;
         playerAcceleration = 1f;
         playerDrag = 0.9f;
+        
+        direction = "right";
     }
 
-    // Update is called once per frame
     void Update()
     {
-        getPlayerInput();
+        getPlayerInput(); //Determine Player Left-Right Movement Input
         if(Input.GetKey(KeyCode.J) && isGrounded){ //Player will jump if J is down
             playerJump();
         }
+        if(Input.GetKeyDown(KeyCode.F) && isFiring == false){ //Fire projectile if player presses F
+            playerFire();
+        }
 
-        if(currentStateCompleted == true){
+        if(currentStateCompleted == true){ //If state is complete, switch to next state
             DetermineNewState();
         }
         UpdateState();
@@ -49,9 +53,16 @@ public class PlayerManager : MonoBehaviour //Script is based on Code Class - 2D 
         movePlayer();
     }
 
-    private void DetermineNewState(){
+
+    //STATE MACHINE FUNCTIONS
+    private void DetermineNewState(){ //Check each possible state and switch to them based on current stats
         currentStateCompleted = false;
-        if(isGrounded == true){ //Determining current state
+        
+        //Determining current state
+        if(isFiring == true){
+            currentState = PlayerState.Fire;
+            StartFireState();
+        } else if(isGrounded == true){
             if(horizontalMovement == 0){
                 currentState = PlayerState.Idle;
                 StartIdleState(); //Calling Entry Function
@@ -76,15 +87,19 @@ public class PlayerManager : MonoBehaviour //Script is based on Code Class - 2D 
             case PlayerState.Jump:
                 UpdateJump();
                 break;
+            case PlayerState.Fire:
+                UpdateFire();
+                break;
         }
     }
 
+    //INDIVIDUAL STATE FUNCTIONS
     private void StartIdleState(){
         //animator.Play("Idle"); FOR ANIMATOR
     }
 
     private void UpdateIdle(){
-        if(horizontalMovement != 0){ //Exit conditions
+        if(horizontalMovement != 0 || isGrounded == false || isFiring == true){ //Exit conditions
             currentStateCompleted = true;
         }
     }
@@ -94,7 +109,10 @@ public class PlayerManager : MonoBehaviour //Script is based on Code Class - 2D 
     }
 
     private void UpdateMove(){
-        if(horizontalMovement == 0 || !isGrounded){
+        float xVelocity = rb.velocity.x; //To enable staying within Move State until velocity == 0f
+        //animator.speed = Mathf.Abs(xVelocity)/5f;
+
+        if(Mathf.Abs(xVelocity) < 0.1f || isGrounded == false || isFiring == true){
             currentState = PlayerState.Idle;
             currentStateCompleted = true;
         }
@@ -105,15 +123,33 @@ public class PlayerManager : MonoBehaviour //Script is based on Code Class - 2D 
     }
 
     private void UpdateJump(){
-        if(isGrounded){
+        if(isGrounded == true || isFiring == true){
             currentStateCompleted = true;
         }
     }
 
+    private void StartFireState(){
+        //animator.Play("Fire"); FOR ANIMATOR
+        firingCounter = 0f;
+        Debug.Log("Fire State Start");
+    }
+
+    private void UpdateFire(){
+        firingCounter += Time.deltaTime;
+        if(firingCounter >= 1.0f){ //End fire state after animation complete
+            isFiring = false;
+            Debug.Log("Fire State End");
+            currentStateCompleted = true;
+        }
+    }
+
+    //MOVEMENT & INPUT FUNCTIONS
     private void getPlayerInput(){ //Adjusts horizontal movement force depending on player input
         if(Input.GetKey(KeyCode.R)){ //Player will move Right when R is pressed
+            direction = "right";
             horizontalMovement = 1f;
         } else if(Input.GetKey(KeyCode.L)){ //Player will move Left when L is pressed
+            direction = "left";
             horizontalMovement = -1f;
         } else{
             horizontalMovement = 0f;
@@ -143,5 +179,10 @@ public class PlayerManager : MonoBehaviour //Script is based on Code Class - 2D 
         if(isGrounded && horizontalMovement == 0 && rb.velocity.y <= 0){
             rb.velocity *= playerDrag;
         }
+    }
+
+    private void playerFire(){
+        isFiring = true;
+        Debug.Log("fire" + direction); //For Debugging
     }
 }
