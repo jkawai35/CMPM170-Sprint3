@@ -5,7 +5,7 @@ using UnityEngine;
 public class PlayerManager : MonoBehaviour //Script is based on Code Class - 2D Player Movement in Unity: https://www.youtube.com/watch?v=0-c3ErDzrh8
 {
     //PLAYER MANAGER VARIABLES
-    enum PlayerState {Idle, Move, Jump, Fire} //The set of states for an FSM
+    enum PlayerState {Idle, Move, Jump, Fire, Dash} //The set of states for an FSM
     PlayerState currentState;
     private bool currentStateCompleted; //Boolean value to determine when to start new state
 
@@ -15,8 +15,8 @@ public class PlayerManager : MonoBehaviour //Script is based on Code Class - 2D 
     [Range(0f, 1f)] [SerializeField] private float playerDrag;
     [SerializeField] private BoxCollider2D groundCheckCollider;
     [SerializeField] private LayerMask groundMask;
-    private float horizontalMovement, moveIncrement, totalHorizontalSpeed, firingCounter;
-    private bool isGrounded, isFiring;
+    private float horizontalMovement, moveIncrement, totalHorizontalSpeed, firingCounter, dashingCounter;
+    private bool isGrounded, isFiring, isDashing, dashReady;
     private string direction;
 
     //INITIAL FUNCTIONS
@@ -28,16 +28,24 @@ public class PlayerManager : MonoBehaviour //Script is based on Code Class - 2D 
         playerDrag = 0.9f;
         
         direction = "right";
+        isFiring = false; 
+        isDashing = false;
+        dashReady = true;
     }
 
     void Update()
     {
-        getPlayerInput(); //Determine Player Left-Right Movement Input
+        if(isDashing != true){ //Checks if currently dashing so that player doesn't flip during dash
+            getPlayerInput(); //Determine Player Left-Right Movement Input
+        }
         if(Input.GetKey(KeyCode.J) && isGrounded){ //Player will jump if J is down
             playerJump();
         }
         if(Input.GetKeyDown(KeyCode.F) && isFiring == false){ //Fire projectile if player presses F
             playerFire();
+        }
+        if(Input.GetKeyDown(KeyCode.D) && isDashing == false && dashReady == true){ //Dash if player presses D
+            playerDash();
         }
 
         if(currentStateCompleted == true){ //If state is complete, switch to next state
@@ -62,6 +70,9 @@ public class PlayerManager : MonoBehaviour //Script is based on Code Class - 2D 
         if(isFiring == true){
             currentState = PlayerState.Fire;
             StartFireState();
+        } else if(isDashing == true){
+            currentState = PlayerState.Dash;
+            StartDashState();
         } else if(isGrounded == true){
             if(horizontalMovement == 0){
                 currentState = PlayerState.Idle;
@@ -77,7 +88,7 @@ public class PlayerManager : MonoBehaviour //Script is based on Code Class - 2D 
     }
 
     void UpdateState(){
-        switch (currentState){
+        switch (currentState){ //Switch runs different things depending on the currentState variable
             case PlayerState.Idle:
                 UpdateIdle();
                 break;
@@ -90,21 +101,26 @@ public class PlayerManager : MonoBehaviour //Script is based on Code Class - 2D 
             case PlayerState.Fire:
                 UpdateFire();
                 break;
+            case PlayerState.Dash:
+                UpdateDash();
+                break;
         }
     }
 
     //INDIVIDUAL STATE FUNCTIONS
     private void StartIdleState(){
+        Debug.Log("Idle State");
         //animator.Play("Idle"); FOR ANIMATOR
     }
 
     private void UpdateIdle(){
-        if(horizontalMovement != 0 || isGrounded == false || isFiring == true){ //Exit conditions
+        if(horizontalMovement != 0 || isGrounded == false || isFiring == true || isDashing == true){ //Exit conditions
             currentStateCompleted = true;
         }
     }
 
     private void StartMoveState(){
+        Debug.Log("Move State");
         //animator.Play("Move"); FOR ANIMATOR
     }
 
@@ -112,23 +128,25 @@ public class PlayerManager : MonoBehaviour //Script is based on Code Class - 2D 
         float xVelocity = rb.velocity.x; //To enable staying within Move State until velocity == 0f
         //animator.speed = Mathf.Abs(xVelocity)/5f;
 
-        if(Mathf.Abs(xVelocity) < 0.1f || isGrounded == false || isFiring == true){
-            currentState = PlayerState.Idle;
+        if(Mathf.Abs(xVelocity) < 0.1f || isGrounded == false || isFiring == true || isDashing == true){
+            //currentState = PlayerState.Idle;
             currentStateCompleted = true;
         }
     }
 
     private void StartJumpState(){
+        Debug.Log("Jump State");
         //animator.Play("Jump"); FOR ANIMATOR
     }
 
     private void UpdateJump(){
-        if(isGrounded == true || isFiring == true){
+        if(isGrounded == true || isFiring == true || isDashing == true){
             currentStateCompleted = true;
         }
     }
 
     private void StartFireState(){
+        Debug.Log("Fire State");
         //animator.Play("Fire"); FOR ANIMATOR
         firingCounter = 0f;
         Debug.Log("Fire State Start");
@@ -139,6 +157,23 @@ public class PlayerManager : MonoBehaviour //Script is based on Code Class - 2D 
         if(firingCounter >= 1.0f){ //End fire state after animation complete
             isFiring = false;
             Debug.Log("Fire State End");
+            currentStateCompleted = true;
+        }
+    }
+
+    private void StartDashState(){
+        Debug.Log("Dash State");
+        //animator.Play("Dash"); FOR ANIMATOR
+        dashingCounter = 0f;
+        dashReady = false;
+    }
+
+    private void UpdateDash(){
+        dashingCounter += Time.deltaTime;
+        if(dashingCounter >= 0.25f){
+            StartCoroutine(DashCooldown());
+            isDashing = false;
+            horizontalMovement = 0f;
             currentStateCompleted = true;
         }
     }
@@ -157,7 +192,9 @@ public class PlayerManager : MonoBehaviour //Script is based on Code Class - 2D 
     }
 
     private void movePlayer(){
-        if(horizontalMovement != 0){ //Apply movement if movement force != 0
+        if((horizontalMovement != 0 && currentState == PlayerState.Dash)){ //Apply dash movement
+            rb.velocity = new Vector2(horizontalMovement, 0f);
+        }else if(horizontalMovement != 0 && currentState != PlayerState.Dash){ //Apply movement if movement force != 0 and not currently dashing
             moveIncrement = horizontalMovement * playerAcceleration; //Applying acceleration if movement key is still being pressed
             totalHorizontalSpeed = Mathf.Clamp(rb.velocity.x + moveIncrement, -playerMoveSpeed, playerMoveSpeed);
 
@@ -184,5 +221,19 @@ public class PlayerManager : MonoBehaviour //Script is based on Code Class - 2D 
     private void playerFire(){
         isFiring = true;
         Debug.Log("fire" + direction); //For Debugging
+    }
+
+    private void playerDash(){
+        isDashing = true;
+        if(direction == "right"){
+            horizontalMovement = 10f;
+        } else{ //direction == "left"
+            horizontalMovement = -10f;
+        }
+    }
+
+    IEnumerator DashCooldown(){
+        yield return new WaitForSeconds(1f); //Cooldown is 1 second
+        dashReady = true;
     }
 }
