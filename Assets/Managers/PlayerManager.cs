@@ -2,7 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerManager : MonoBehaviour //Script is based on Code Class - 2D Player Movement in Unity: https://www.youtube.com/watch?v=0-c3ErDzrh8
+//Script is based on Code Class - 2D Player Movement in Unity: https://www.youtube.com/watch?v=0-c3ErDzrh8
+//And Code Class - Build your own State Machines!: https://www.youtube.com/watch?v=-jkT4oFi1vk
+public class PlayerManager : MonoBehaviour 
 {
     //PLAYER MANAGER VARIABLES
     enum PlayerState {Idle, Move, Jump, Fire, Dash} //The set of states for an FSM
