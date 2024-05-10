@@ -75,6 +75,7 @@ public class PlayerManager : MonoBehaviour
         checkIfGrounded();
         implementFriction();
         movePlayer();
+        updateSpriteDirection();
     }
 
 
@@ -269,6 +270,14 @@ public class PlayerManager : MonoBehaviour
             rb.velocity = new Vector2(totalHorizontalSpeed, rb.velocity.y);
         } else{ //Stop movement if no correct movement key is being pressed
             rb.velocity = new Vector2(0f, rb.velocity.y);
+        }
+    }
+
+    private void updateSpriteDirection(){ //Flip Sprite to face left or right depending on current direction value
+        if(direction == "right"){
+            transform.localScale = new Vector2(1, 1);
+        } else{ //direction == "left"
+            transform.localScale = new Vector2(-1, 1);
         }
     }
 
