@@ -7,7 +7,7 @@ using UnityEngine;
 public class PlayerManager : MonoBehaviour 
 {
     //PLAYER MANAGER VARIABLES
-    enum PlayerState {Idle, Move, Jump, Fire, Dash} //The set of states for an FSM
+    enum PlayerState {Idle, Move, Jump, Fire, Dash, Block, Hurt} //The set of states for an FSM
     PlayerState currentState;
     private bool currentStateCompleted; //Boolean value to determine when to start new state
 
@@ -17,9 +17,10 @@ public class PlayerManager : MonoBehaviour
     [Range(0f, 1f)] [SerializeField] private float playerDrag;
     [SerializeField] private BoxCollider2D groundCheckCollider;
     [SerializeField] private LayerMask groundMask;
-    private float horizontalMovement, moveIncrement, totalHorizontalSpeed, firingCounter, dashingCounter;
-    private bool isGrounded, isFiring, isDashing, dashReady;
+    private float horizontalMovement, moveIncrement, totalHorizontalSpeed, firingCounter, dashingCounter, blockCounter, hurtCounter;
+    private bool isGrounded, isFiring, isDashing, dashReady, canDoubleJump, isBlocking, isHurt;
     private string direction;
+    private int playerHealth;
 
     //INITIAL FUNCTIONS
     void Start()
@@ -29,25 +30,38 @@ public class PlayerManager : MonoBehaviour
         playerAcceleration = 1f;
         playerDrag = 0.9f;
         
+        playerHealth = 3;
         direction = "right";
         isFiring = false; 
         isDashing = false;
         dashReady = true;
+        canDoubleJump = false;
+        isBlocking = false;
+        isHurt = false;
     }
 
     void Update()
     {
-        if(isDashing != true){ //Checks if currently dashing so that player doesn't flip during dash
-            getPlayerInput(); //Determine Player Left-Right Movement Input
+        if(isHurt == false && playerHealth > 0){ //Player Inputs will only work if the player currently isn't hurt and still has life
+            if(isDashing != true){ //Checks if currently dashing so that player doesn't flip during dash
+                getPlayerInput(); //Determine Player Left-Right Movement Input
+            }
+            if(Input.GetKey(KeyCode.J) && isGrounded){ //Player will jump if J is down
+                playerJump();
+            }
+            if(Input.GetKeyDown(KeyCode.F) && isFiring == false && isDashing == false && isBlocking == false){ //Fire projectile if player presses F
+                playerFire();
+            }
+            if(Input.GetKeyDown(KeyCode.D) && isDashing == false && dashReady == true  && isFiring == false && isBlocking == false){ //Dash if player presses D
+                playerDash();
+            } 
+            if(Input.GetKeyDown(KeyCode.B) && isBlocking == false && isFiring == false && isDashing == false){ //Block if player presses B
+                playerBlock();
+            }
         }
-        if(Input.GetKey(KeyCode.J) && isGrounded){ //Player will jump if J is down
-            playerJump();
-        }
-        if(Input.GetKeyDown(KeyCode.F) && isFiring == false){ //Fire projectile if player presses F
-            playerFire();
-        }
-        if(Input.GetKeyDown(KeyCode.D) && isDashing == false && dashReady == true){ //Dash if player presses D
-            playerDash();
+
+        if(Input.GetKeyDown(KeyCode.H)){ //TEMP FUNCTION TO TEST HURT STATE
+            playerHurt();
         }
 
         if(currentStateCompleted == true){ //If state is complete, switch to next state
@@ -66,15 +80,21 @@ public class PlayerManager : MonoBehaviour
 
     //STATE MACHINE FUNCTIONS
     private void DetermineNewState(){ //Check each possible state and switch to them based on current stats
-        currentStateCompleted = false;
+        currentStateCompleted = false; //Resetting to false to enable accessibility to next state
         
         //Determining current state
-        if(isFiring == true){
+        if(isHurt == true){
+            currentState = PlayerState.Hurt;
+            StartHurtState();
+        } else if(isFiring == true){
             currentState = PlayerState.Fire;
             StartFireState();
         } else if(isDashing == true){
             currentState = PlayerState.Dash;
             StartDashState();
+        } else if(isBlocking == true){
+            currentState = PlayerState.Block;
+            StartBlockState();
         } else if(isGrounded == true){
             if(horizontalMovement == 0){
                 currentState = PlayerState.Idle;
@@ -106,6 +126,12 @@ public class PlayerManager : MonoBehaviour
             case PlayerState.Dash:
                 UpdateDash();
                 break;
+            case PlayerState.Block:
+                UpdateBlock();
+                break;
+            case PlayerState.Hurt:
+                UpdateHurt();
+                break;
         }
     }
 
@@ -116,7 +142,7 @@ public class PlayerManager : MonoBehaviour
     }
 
     private void UpdateIdle(){
-        if(horizontalMovement != 0 || isGrounded == false || isFiring == true || isDashing == true){ //Exit conditions
+        if(horizontalMovement != 0 || isGrounded == false || isFiring == true || isDashing == true || isBlocking == true){ //Exit conditions
             currentStateCompleted = true;
         }
     }
@@ -130,7 +156,7 @@ public class PlayerManager : MonoBehaviour
         float xVelocity = rb.velocity.x; //To enable staying within Move State until velocity == 0f
         //animator.speed = Mathf.Abs(xVelocity)/5f;
 
-        if(Mathf.Abs(xVelocity) < 0.1f || isGrounded == false || isFiring == true || isDashing == true){
+        if(Mathf.Abs(xVelocity) < 0.1f || isGrounded == false || isFiring == true || isDashing == true || isBlocking == true){
             //currentState = PlayerState.Idle;
             currentStateCompleted = true;
         }
@@ -138,11 +164,19 @@ public class PlayerManager : MonoBehaviour
 
     private void StartJumpState(){
         Debug.Log("Jump State");
+        //canDoubleJump = true;
         //animator.Play("Jump"); FOR ANIMATOR
     }
 
     private void UpdateJump(){
-        if(isGrounded == true || isFiring == true || isDashing == true){
+        if(Input.GetKeyDown(KeyCode.X) && canDoubleJump == true){ //Jump again if X is pressed while currently jumping
+            playerJump();
+            canDoubleJump = false;
+        }
+        if(isGrounded == true || isFiring == true || isDashing == true || isBlocking == true){
+            if(isGrounded == true){ //Only reset double jump ability if ground touched
+                canDoubleJump = true;
+            }
             currentStateCompleted = true;
         }
     }
@@ -176,6 +210,38 @@ public class PlayerManager : MonoBehaviour
             StartCoroutine(DashCooldown());
             isDashing = false;
             horizontalMovement = 0f;
+            currentStateCompleted = true;
+        }
+    }
+
+    private void StartBlockState(){
+        Debug.Log("Block State");
+        //animator.Play("Block"); FOR ANIMATOR
+        blockCounter = 0f;
+        Debug.Log("Blocking Start");
+    }
+
+    private void UpdateBlock(){
+        blockCounter += Time.deltaTime;
+        if(blockCounter >= 1.0f){ //End block state after 1 second
+            Debug.Log("Blocking End");
+            isBlocking = false;
+            currentStateCompleted = true;
+        }
+    }
+
+    private void StartHurtState(){
+        Debug.Log("Hurt State");
+        //animator.Play("Hurt"); FOR ANIMATOR
+        hurtCounter = 0f;
+        Debug.Log("Hurt Start");
+    }
+
+    private void UpdateHurt(){
+        hurtCounter += Time.deltaTime;
+        if(hurtCounter >= 1.0f){
+            Debug.Log("Hurt End");
+            isHurt = false;
             currentStateCompleted = true;
         }
     }
@@ -235,7 +301,18 @@ public class PlayerManager : MonoBehaviour
     }
 
     IEnumerator DashCooldown(){
-        yield return new WaitForSeconds(1f); //Cooldown is 1 second
+        yield return new WaitForSeconds(1.5f); //Cooldown is 1.5 second
         dashReady = true;
+    }
+
+    private void playerBlock(){
+        isBlocking = true;
+    }
+
+    private void playerHurt(){ //TEMP FUNCTION CAN BE REPLACED WITH ONCOLLISIONENTER
+        playerHealth -= 1; //Reduce health by 1
+        horizontalMovement = 0f; //Stop all horizontal movement
+        isHurt = true; //Enable switching to hurt state
+        currentStateCompleted = true;
     }
 }
