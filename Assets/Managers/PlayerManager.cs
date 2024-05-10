@@ -191,7 +191,7 @@ public class PlayerManager : MonoBehaviour
 
     private void UpdateFire(){
         firingCounter += Time.deltaTime;
-        if(firingCounter >= 1.0f){ //End fire state after animation complete
+        if(firingCounter >= 0.1f){ //End fire state after animation complete
             isFiring = false;
             Debug.Log("Fire State End");
             currentStateCompleted = true;
@@ -297,7 +297,7 @@ public class PlayerManager : MonoBehaviour
 
     private void playerFire(){
         isFiring = true;
-        Debug.Log("fire" + direction); //For Debugging
+        AmmoManager.instance.Fire(direction); //Calling AmmoManager Instance to Fire
     }
 
     private void playerDash(){
