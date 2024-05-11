@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class CameraFollow : MonoBehaviour
 {
+    //Based on How to Make Camera Follow In UNITY 2D - https://www.youtube.com/watch?v=FXqwunFQuao
     [SerializeField] private float followSpeed = 2f;
     [SerializeField] private Transform target;
     [SerializeField] private float xOffset, yOffset; //To add offset from player
@@ -12,6 +13,6 @@ public class CameraFollow : MonoBehaviour
     void Update()
     {
         Vector3 newPosition = new Vector3(target.position.x + xOffset, target.position.y + yOffset, -10f); //-10f because that is the default position of Cameras
-        transform.position = Vector3.Slerp(transform.position, newPosition, followSpeed * Time.deltaTime);
+        transform.position = Vector3.Slerp(transform.position, newPosition, followSpeed * Time.deltaTime); //Follow target position
     }
 }
