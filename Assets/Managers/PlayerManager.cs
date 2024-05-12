@@ -12,7 +12,7 @@ public class PlayerManager : MonoBehaviour
     private bool currentStateCompleted; //Boolean value to determine when to start new state
 
     [SerializeField] private Rigidbody2D rb;
-    //[SerializeField] private Animator animator; FOR WHEN ANIMATIONS ARE ADDED
+    [SerializeField] private Animator animator; //FOR WHEN ANIMATIONS ARE ADDED
     [SerializeField] private float playerMoveSpeed, playerJumpSpeed, playerAcceleration;
     [Range(0f, 1f)] [SerializeField] private float playerDrag;
     [SerializeField] private BoxCollider2D groundCheckCollider;
@@ -139,7 +139,7 @@ public class PlayerManager : MonoBehaviour
     //INDIVIDUAL STATE FUNCTIONS
     private void StartIdleState(){
         Debug.Log("Idle State");
-        //animator.Play("Idle"); FOR ANIMATOR
+        animator.Play("Player_Idle");
     }
 
     private void UpdateIdle(){
@@ -150,7 +150,7 @@ public class PlayerManager : MonoBehaviour
 
     private void StartMoveState(){
         Debug.Log("Move State");
-        //animator.Play("Move"); FOR ANIMATOR
+        animator.Play("Player_Move");
     }
 
     private void UpdateMove(){
@@ -165,8 +165,7 @@ public class PlayerManager : MonoBehaviour
 
     private void StartJumpState(){
         Debug.Log("Jump State");
-        //canDoubleJump = true;
-        //animator.Play("Jump"); FOR ANIMATOR
+        animator.Play("Player_Dash"); //DASH AND JUMP SHARE SAME ANIMATION
     }
 
     private void UpdateJump(){
@@ -184,7 +183,7 @@ public class PlayerManager : MonoBehaviour
 
     private void StartFireState(){
         Debug.Log("Fire State");
-        //animator.Play("Fire"); FOR ANIMATOR
+        animator.Play("Player_Attack");
         firingCounter = 0f;
         Debug.Log("Fire State Start");
     }
@@ -200,7 +199,7 @@ public class PlayerManager : MonoBehaviour
 
     private void StartDashState(){
         Debug.Log("Dash State");
-        //animator.Play("Dash"); FOR ANIMATOR
+        animator.Play("Player_Dash"); //FOR ANIMATOR
         dashingCounter = 0f;
         dashReady = false;
     }
@@ -217,7 +216,7 @@ public class PlayerManager : MonoBehaviour
 
     private void StartBlockState(){
         Debug.Log("Block State");
-        //animator.Play("Block"); FOR ANIMATOR
+        animator.Play("Player_Block");
         blockCounter = 0f;
         Debug.Log("Blocking Start");
     }
@@ -233,7 +232,7 @@ public class PlayerManager : MonoBehaviour
 
     private void StartHurtState(){
         Debug.Log("Hurt State");
-        //animator.Play("Hurt"); FOR ANIMATOR
+        animator.Play("Player_Hurt");
         hurtCounter = 0f;
         Debug.Log("Hurt Start");
     }
