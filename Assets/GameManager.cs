@@ -5,7 +5,7 @@ using UnityEngine;
 public class GameManager : MonoBehaviour
 {
     public static GameManager instance;
-    private bool isGameOver;
+    private bool isGameOver, playerWin;
 
     void Awake(){
         if(instance == null){
@@ -19,6 +19,7 @@ public class GameManager : MonoBehaviour
     void Start()
     {
         isGameOver = false;
+        playerWin = false;
     }
 
     // Update is called once per frame
@@ -31,7 +32,14 @@ public class GameManager : MonoBehaviour
         return isGameOver;
     }
 
-    public void gameOver(){
+    public bool getPlayerWin(){
+        return playerWin;
+    }
+
+    public void gameOver(bool playerWinStatus){
         isGameOver = true;
+        if(playerWinStatus == true){
+            playerWin = true;
+        }
     }
 }

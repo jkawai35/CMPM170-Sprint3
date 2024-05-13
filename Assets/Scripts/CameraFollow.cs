@@ -8,11 +8,18 @@ public class CameraFollow : MonoBehaviour
     [SerializeField] private float followSpeed = 2f;
     [SerializeField] private Transform target;
     [SerializeField] private float xOffset, yOffset; //To add offset from player
+    [SerializeField] private Vector2 minPosition, maxPosition; //For Camera Bounds
 
     // Update is called once per frame
-    void Update()
+    void FixedUpdate()
     {
+        //Acquring new position for camera depending on target location
         Vector3 newPosition = new Vector3(target.position.x + xOffset, target.position.y + yOffset, -10f); //-10f because that is the default position of Cameras
-        transform.position = Vector3.Slerp(transform.position, newPosition, followSpeed * Time.deltaTime); //Follow target position
+        
+        //Checking if new position is within bounds
+        Vector3 boundPosition = new Vector3(Mathf.Clamp(newPosition.x, minPosition.x, maxPosition.x), Mathf.Clamp(newPosition.y, minPosition.y, maxPosition.y), -10f); //Mathf.Clamp checks first argument and ensures if it is within min and max
+        
+        //Updating position
+        transform.position = Vector3.Slerp(transform.position, boundPosition, followSpeed * Time.deltaTime); //Follow target position
     }
 }
