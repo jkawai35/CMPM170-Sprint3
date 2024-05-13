@@ -4,15 +4,44 @@ using UnityEngine;
 
 public class CannonScript : MonoBehaviour
 {
+    public static CannonScript SharedInstance;
+    private List<GameObject> pooledObjects = new List<GameObject>();
+    //public GameObject objectToPool;
+    public int amountToPool;
+
     public Transform FirePoint;
     public GameObject ProjectilePrefab;
     float shootInterval = 3f;
     float lastShoot = 0f;
     //shotsPool = new ObjectPool<ProjectilePrefab>(createFunc: () => new ProjectilePrefab("PooledShot"), actionOnGet: (obj) => obj.SetActive(true), actionOnRelease: (obj) => obj.SetActive(false), actionOnDestroy: (obj) => Destroy(obj), collectionChecks: false, defaultCapacity: 20, maxPoolSize: 20);
     // Start is called before the first frame update
+
+    void Awake()
+    {
+        SharedInstance = this;
+    }
+
     void Start()
     {
-        
+        GameObject tmp;
+        for (int i = 0; i < amountToPool; i++)
+        {
+            tmp = Instantiate(ProjectilePrefab);
+            tmp.SetActive(false);
+            pooledObjects.Add(tmp);
+        }
+    }
+    
+    public GameObject GetPooledObject()
+    {
+        for(int i = 0; i< amountToPool; i++)
+        {
+            if(!pooledObjects[i].activeInHierarchy)
+            {
+                return pooledObjects[i];
+            }
+        }
+        return null;
     }
 
     /*IEnumerator ShootTimer()
@@ -26,9 +55,15 @@ public class CannonScript : MonoBehaviour
         lastShoot += Time.deltaTime;
         if (lastShoot >= shootInterval)
         {
-            Instantiate(ProjectilePrefab, FirePoint.position, FirePoint.rotation);
+            GameObject projectile = CannonScript.SharedInstance.GetPooledObject();
+            if (projectile != null) {
+                projectile.transform.position = FirePoint.position;
+                projectile.transform.rotation = FirePoint.rotation;
+                projectile.SetActive(true);
+                lastShoot = 0f;
+            }
+            //Instantiate(ProjectilePrefab, FirePoint.position, FirePoint.rotation);
             //ProjectilePrefab newShot = pool.Get();
-            lastShoot = 0f;
         }
     }
 }

@@ -329,6 +329,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: Cannon
       objectReference: {fileID: 0}
+    - target: {fileID: 4735405303436433072, guid: 7ec2d51097a46e84fbc66d78fed5a024, type: 3}
+      propertyPath: amountToPool
+      value: 20
+      objectReference: {fileID: 0}
+    - target: {fileID: 4735405303436433072, guid: 7ec2d51097a46e84fbc66d78fed5a024, type: 3}
+      propertyPath: objectToPool
+      value: 
+      objectReference: {fileID: 199310137512764927, guid: 7bf7d6813fa8634479f06887d6267eff, type: 3}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
