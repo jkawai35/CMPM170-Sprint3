@@ -621,6 +621,8 @@ MonoBehaviour:
   target: {fileID: 1485367906}
   xOffset: 0
   yOffset: 0
+  minPosition: {x: -5, y: -2.2}
+  maxPosition: {x: 5, y: 0}
 --- !u!1 &1731454257
 GameObject:
   m_ObjectHideFlags: 0

@@ -17,6 +17,7 @@ public class PlayerManager : MonoBehaviour
     [Range(0f, 1f)] [SerializeField] private float playerDrag;
     [SerializeField] private BoxCollider2D groundCheckCollider;
     [SerializeField] private LayerMask groundMask;
+    private SpriteRenderer rend;
     private float horizontalMovement, moveIncrement, totalHorizontalSpeed, firingCounter, dashingCounter, blockCounter, hurtCounter;
     private bool isGrounded, isFiring, isDashing, dashReady, canDoubleJump, isBlocking, isHurt;
     private string direction;
@@ -29,6 +30,8 @@ public class PlayerManager : MonoBehaviour
         playerJumpSpeed = 7.8f;
         playerAcceleration = 1f;
         playerDrag = 0.9f;
+
+        rend = GetComponent<SpriteRenderer>();
         
         playerHealth = 3;
         direction = "right";
@@ -233,6 +236,7 @@ public class PlayerManager : MonoBehaviour
     private void StartHurtState(){
         Debug.Log("Hurt State");
         animator.Play("Player_Hurt");
+        rend.color = Color.red; //Changing colour of sprite to red to indicate hurt
         hurtCounter = 0f;
         Debug.Log("Hurt Start");
     }
@@ -242,6 +246,7 @@ public class PlayerManager : MonoBehaviour
         if(hurtCounter >= 1.0f){
             Debug.Log("Hurt End");
             isHurt = false;
+            rend.color = Color.white; //Resetting colour
             currentStateCompleted = true;
         }
     }

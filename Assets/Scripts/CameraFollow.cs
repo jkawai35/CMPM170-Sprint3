@@ -5,6 +5,7 @@ using UnityEngine;
 public class CameraFollow : MonoBehaviour
 {
     //Based on How to Make Camera Follow In UNITY 2D - https://www.youtube.com/watch?v=FXqwunFQuao
+    //and Unity 2D Platformer Tutorial 8 - How To Create 2D Camera Bounds - https://www.youtube.com/watch?v=Fqht4gyqFbo
     [SerializeField] private float followSpeed = 2f;
     [SerializeField] private Transform target;
     [SerializeField] private float xOffset, yOffset; //To add offset from player
