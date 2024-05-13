@@ -17,8 +17,7 @@ public class Projectile : MonoBehaviour
         this.GetComponent<Rigidbody2D>().velocity = Vector3.zero;
         if(collider.gameObject.layer == 7){ //If Layer == "Ground"
             this.gameObject.SetActive(false);
-        } 
-         else if(collider.gameObject.layer == 6){
+        } else if(collider.gameObject.layer == 6){
             collider.gameObject.SetActive(false);
         }
     }
