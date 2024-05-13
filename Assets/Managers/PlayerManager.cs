@@ -26,7 +26,7 @@ public class PlayerManager : MonoBehaviour
     void Start()
     {
         playerMoveSpeed = 5f;
-        playerJumpSpeed = 6.5f;
+        playerJumpSpeed = 7.5f;
         playerAcceleration = 1f;
         playerDrag = 0.9f;
         
