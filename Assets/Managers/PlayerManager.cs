@@ -16,7 +16,7 @@ public class PlayerManager : MonoBehaviour
     [SerializeField] private float playerMoveSpeed, playerJumpSpeed, playerAcceleration;
     [Range(0f, 1f)] [SerializeField] private float playerDrag;
     [SerializeField] private BoxCollider2D groundCheckCollider;
-    [SerializeField] private LayerMask groundMask;
+    [SerializeField] private LayerMask groundMask, lavaMask;
     private SpriteRenderer rend;
     private float horizontalMovement, moveIncrement, totalHorizontalSpeed, firingCounter, dashingCounter, blockCounter, hurtCounter;
     private bool isGrounded, isFiring, isDashing, dashReady, canDoubleJump, isBlocking, isHurt;
@@ -290,7 +290,11 @@ public class PlayerManager : MonoBehaviour
     }
 
     private void checkIfGrounded(){ //If ground collider is overlapping objects in Ground Layer, make is Grounded true
-        isGrounded = Physics2D.OverlapAreaAll(groundCheckCollider.bounds.min, groundCheckCollider.bounds.max, groundMask).Length > 0;
+        if(Physics2D.OverlapAreaAll(groundCheckCollider.bounds.min, groundCheckCollider.bounds.max, lavaMask).Length > 0){ //If ground collider touches lava, game over!
+            GameManager.instance.gameOver(false);
+        } else{
+            isGrounded = Physics2D.OverlapAreaAll(groundCheckCollider.bounds.min, groundCheckCollider.bounds.max, groundMask).Length > 0;
+        }
     }
 
     private void implementFriction(){ //Adding Friction to player if touching ground and no movement is being inputed
