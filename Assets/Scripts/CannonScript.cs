@@ -11,7 +11,7 @@ public class CannonScript : MonoBehaviour
 
     public Transform FirePoint;
     public GameObject ProjectilePrefab;
-    float shootInterval = 3f;
+    float shootInterval = 1f;
     float lastShoot = 0f;
     //shotsPool = new ObjectPool<ProjectilePrefab>(createFunc: () => new ProjectilePrefab("PooledShot"), actionOnGet: (obj) => obj.SetActive(true), actionOnRelease: (obj) => obj.SetActive(false), actionOnDestroy: (obj) => Destroy(obj), collectionChecks: false, defaultCapacity: 20, maxPoolSize: 20);
     // Start is called before the first frame update
@@ -55,6 +55,7 @@ public class CannonScript : MonoBehaviour
         lastShoot += Time.deltaTime;
         if (lastShoot >= shootInterval)
         {
+            Debug.Log("shooting");
             GameObject projectile = CannonScript.SharedInstance.GetPooledObject();
             if (projectile != null) {
                 projectile.transform.position = FirePoint.position;

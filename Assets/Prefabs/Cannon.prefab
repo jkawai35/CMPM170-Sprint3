@@ -159,7 +159,7 @@ Rigidbody2D:
   m_Interpolate: 0
   m_SleepingMode: 1
   m_CollisionDetection: 0
-  m_Constraints: 0
+  m_Constraints: 7
 --- !u!114 &4735405303436433072
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -172,6 +172,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9dd1e07f7eed62046be9512c8862c46c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  amountToPool: 0
   FirePoint: {fileID: 2166525675384651579}
   ProjectilePrefab: {fileID: 199310137512764927, guid: 7bf7d6813fa8634479f06887d6267eff, type: 3}
 --- !u!1 &8722387289819003452
