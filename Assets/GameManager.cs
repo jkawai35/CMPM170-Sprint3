@@ -41,5 +41,6 @@ public class GameManager : MonoBehaviour
         if(playerWinStatus == true){
             playerWin = true;
         }
+        Debug.Log("GAME OVER!");
     }
 }

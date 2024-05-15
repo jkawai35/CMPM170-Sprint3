@@ -216,6 +216,9 @@ MonoBehaviour:
   groundMask:
     serializedVersion: 2
     m_Bits: 128
+  lavaMask:
+    serializedVersion: 2
+    m_Bits: 256
 --- !u!95 &8552354819634857900
 Animator:
   serializedVersion: 5
