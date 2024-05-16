@@ -55,7 +55,7 @@ public class CannonScript : MonoBehaviour
         lastShoot += Time.deltaTime;
         if (lastShoot >= shootInterval)
         {
-            Debug.Log("shooting");
+            //Debug.Log("shooting");
             GameObject projectile = CannonScript.SharedInstance.GetPooledObject();
             if (projectile != null) {
                 projectile.transform.position = FirePoint.position;

@@ -63,9 +63,9 @@ public class PlayerManager : MonoBehaviour
             }
         }
 
-        if(Input.GetKeyDown(KeyCode.H)){ //TEMP FUNCTION TO TEST HURT STATE
-            playerHurt();
-        }
+        // if(Input.GetKeyDown(KeyCode.H)){ //TEMP FUNCTION TO TEST HURT STATE
+        //     playerHurt();
+        // }
 
         if(currentStateCompleted == true){ //If state is complete, switch to next state
             DetermineNewState();
@@ -324,6 +324,12 @@ public class PlayerManager : MonoBehaviour
 
     private void playerBlock(){
         isBlocking = true;
+    }
+
+    private void OnCollisionEnter2D(Collision2D collider){
+        if(collider.gameObject.layer == 9){ //If player collides with layer 9 ("Enemies")
+            playerHurt();
+        }
     }
 
     private void playerHurt(){ //TEMP FUNCTION CAN BE REPLACED WITH ONCOLLISIONENTER
