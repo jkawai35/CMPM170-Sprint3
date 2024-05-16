@@ -24,7 +24,7 @@ public class Projectile : MonoBehaviour
             Debug.Log("cannon projectile hit ground");
             gameObject.SetActive(false);
         } else if(collider.gameObject.layer == 6){
-            collider.gameObject.SetActive(false);
+            gameObject.SetActive(false);
         }
     }
 

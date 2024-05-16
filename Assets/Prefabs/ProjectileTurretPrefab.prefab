@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 8019749608440146189}
   - component: {fileID: 7255107280394412068}
   - component: {fileID: 8281887799805592057}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: ProjectileTurretPrefab
   m_TagString: Untagged
   m_Icon: {fileID: 0}

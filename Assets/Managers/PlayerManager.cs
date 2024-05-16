@@ -12,7 +12,7 @@ public class PlayerManager : MonoBehaviour
     private bool currentStateCompleted; //Boolean value to determine when to start new state
 
     [SerializeField] private Rigidbody2D rb;
-    [SerializeField] private Animator animator; //FOR WHEN ANIMATIONS ARE ADDED
+    [SerializeField] private Animator animator; //For animations
     [SerializeField] private float playerMoveSpeed, playerJumpSpeed, playerAcceleration;
     [Range(0f, 1f)] [SerializeField] private float playerDrag;
     [SerializeField] private BoxCollider2D groundCheckCollider;
@@ -45,7 +45,7 @@ public class PlayerManager : MonoBehaviour
 
     void Update()
     {
-        if(isHurt == false && playerHealth > 0){ //Player Inputs will only work if the player currently isn't hurt and still has life
+        if(GameManager.instance.getIsGameOver() == false && isHurt == false){ //Player Inputs will only work if the player currently isn't hurt and still has life
             if(isDashing != true){ //Checks if currently dashing so that player doesn't flip during dash
                 getPlayerInput(); //Determine Player Left-Right Movement Input
             }
@@ -243,11 +243,15 @@ public class PlayerManager : MonoBehaviour
 
     private void UpdateHurt(){
         hurtCounter += Time.deltaTime;
-        if(hurtCounter >= 1.0f){
+        if(hurtCounter >= 0.5f){
             Debug.Log("Hurt End");
             isHurt = false;
+            horizontalMovement = 0f; //Resetting horizontal movement
             rend.color = Color.white; //Resetting colour
             currentStateCompleted = true;
+            if(playerHealth == 0){ //Deactivate player if no more health
+                this.gameObject.SetActive(false);
+            }
         }
     }
 
@@ -265,7 +269,9 @@ public class PlayerManager : MonoBehaviour
     }
 
     private void movePlayer(){
-        if((horizontalMovement != 0 && currentState == PlayerState.Dash)){ //Apply dash movement
+        if(currentState == PlayerState.Hurt){ //Apply knock back to player if hurt
+            rb.velocity = new Vector2(horizontalMovement, 1.0f);
+        } else if(horizontalMovement != 0 && currentState == PlayerState.Dash){ //Apply dash movement
             rb.velocity = new Vector2(horizontalMovement, 0f);
         }else if(horizontalMovement != 0 && currentState != PlayerState.Dash){ //Apply movement if movement force != 0 and not currently dashing
             moveIncrement = horizontalMovement * playerAcceleration; //Applying acceleration if movement key is still being pressed
@@ -292,6 +298,7 @@ public class PlayerManager : MonoBehaviour
     private void checkIfGrounded(){ //If ground collider is overlapping objects in Ground Layer, make is Grounded true
         if(Physics2D.OverlapAreaAll(groundCheckCollider.bounds.min, groundCheckCollider.bounds.max, lavaMask).Length > 0){ //If ground collider touches lava, game over!
             GameManager.instance.gameOver(false);
+            this.gameObject.SetActive(false);
         } else{
             isGrounded = Physics2D.OverlapAreaAll(groundCheckCollider.bounds.min, groundCheckCollider.bounds.max, groundMask).Length > 0;
         }
@@ -328,14 +335,25 @@ public class PlayerManager : MonoBehaviour
 
     private void OnCollisionEnter2D(Collision2D collider){
         if(collider.gameObject.layer == 9){ //If player collides with layer 9 ("Enemies")
-            playerHurt();
+            if(collider.gameObject.transform.position.x > this.transform.position.x){ //Determine side of which player was hit on to determine direction of knockback
+                playerHurt("right");
+            } else{ //collider.gameObject.transform.position.x < this.transform.position.x
+                playerHurt("left");
+            }
         }
     }
 
-    private void playerHurt(){ //TEMP FUNCTION CAN BE REPLACED WITH ONCOLLISIONENTER
+    private void playerHurt(string hurtDirection){ //TEMP FUNCTION CAN BE REPLACED WITH ONCOLLISIONENTER
         playerHealth -= 1; //Reduce health by 1
         horizontalMovement = 0f; //Stop all horizontal movement
         isHurt = true; //Enable switching to hurt state
+        
+        if(hurtDirection == "right"){
+            horizontalMovement = -4.0f;
+        } else{ //hurtDirection == "left"
+            horizontalMovement = 4.0f;
+        }
+        
         currentStateCompleted = true;
     }
 }
