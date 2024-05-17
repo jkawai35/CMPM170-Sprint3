@@ -5,7 +5,7 @@ using UnityEngine;
 public class AudioManager : MonoBehaviour
 {
     public static AudioManager instance;
-    [SerializeField] private AudioSource playerAudioSource;
+    [SerializeField] private AudioSource playerAudioSource, doorAudioSource;
     [SerializeField] private AudioClip jumpSound, hurtSound, fireSound, dashSound, shieldSound;
 
     void Awake(){
@@ -35,5 +35,9 @@ public class AudioManager : MonoBehaviour
             playerAudioSource.clip = shieldSound;
         }
         playerAudioSource.Play();
+    }
+
+    public void playGameWinSound(){
+        doorAudioSource.Play();
     }
 }

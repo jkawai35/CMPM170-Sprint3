@@ -226,7 +226,7 @@ public class PlayerManager : MonoBehaviour
 
     private void UpdateBlock(){
         blockCounter += Time.deltaTime;
-        if(blockCounter >= 1.0f){ //End block state after 1 second
+        if(blockCounter >= 0.75f){ //End block state after 0.75 seconds
             Debug.Log("Blocking End");
             isBlocking = false;
             currentStateCompleted = true;
