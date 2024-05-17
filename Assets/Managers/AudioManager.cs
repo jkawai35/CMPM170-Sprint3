@@ -5,7 +5,7 @@ using UnityEngine;
 public class AudioManager : MonoBehaviour
 {
     public static AudioManager instance;
-    [SerializeField] private AudioSource playerAudioSource, doorAudioSource;
+    [SerializeField] private AudioSource playerAudioSource, doorAudioSource, fireballHitAudioSource;
     [SerializeField] private AudioClip jumpSound, hurtSound, fireSound, dashSound, shieldSound;
 
     void Awake(){
@@ -39,5 +39,10 @@ public class AudioManager : MonoBehaviour
 
     public void playGameWinSound(){
         doorAudioSource.Play();
+    }
+
+    public void playFireballHit(Vector2 loadPosition){
+        fireballHitAudioSource.transform.position = loadPosition; //Repositioning location of fireballHitAudioSource
+        fireballHitAudioSource.Play();
     }
 }
