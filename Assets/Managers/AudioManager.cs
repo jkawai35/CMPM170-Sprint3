@@ -5,7 +5,7 @@ using UnityEngine;
 public class AudioManager : MonoBehaviour
 {
     public static AudioManager instance;
-    [SerializeField] private AudioSource playerAudioSource, doorAudioSource, fireballHitAudioSource;
+    [SerializeField] private AudioSource backgroundMusicSource, playerAudioSource, doorAudioSource, fireballHitAudioSource;
     [SerializeField] private AudioClip jumpSound, hurtSound, fireSound, dashSound, shieldSound;
 
     void Awake(){
@@ -19,7 +19,7 @@ public class AudioManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        
+        backgroundMusicSource.Play();
     }
 
     public void playPlayerSound(string chosenAudio){

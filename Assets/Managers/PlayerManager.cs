@@ -251,6 +251,7 @@ public class PlayerManager : MonoBehaviour
             currentStateCompleted = true;
             if(playerHealth == 0){ //Deactivate player if no more health
                 this.gameObject.SetActive(false);
+                GameManager.instance.gameOver(false); //Ending Game
             }
         }
     }
