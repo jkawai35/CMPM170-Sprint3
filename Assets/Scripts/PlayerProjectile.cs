@@ -11,6 +11,7 @@ public class PlayerProjectile : MonoBehaviour
             this.gameObject.SetActive(false);
         } else if(collider.gameObject.layer == 9){ //If Layer == "Enemies"
             this.gameObject.SetActive(false);
+            collider.gameObject.SetActive(false); //Deactivating enemy
         }
     }
 }
