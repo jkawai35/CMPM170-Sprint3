@@ -293,6 +293,7 @@ public class PlayerManager : MonoBehaviour
 
     private void playerJump(){ //Adding y-force to player
         rb.velocity = new Vector2(rb.velocity.x, playerJumpSpeed);
+        AudioManager.instance.playPlayerSound("jump"); //Playing jump audio
     }
 
     private void checkIfGrounded(){ //If ground collider is overlapping objects in Ground Layer, make is Grounded true
@@ -313,6 +314,7 @@ public class PlayerManager : MonoBehaviour
     private void playerFire(){
         isFiring = true;
         AmmoManager.instance.Fire(direction); //Calling AmmoManager Instance to Fire
+        AudioManager.instance.playPlayerSound("fire");
     }
 
     private void playerDash(){
@@ -322,6 +324,7 @@ public class PlayerManager : MonoBehaviour
         } else{ //direction == "left"
             horizontalMovement = -10f;
         }
+        AudioManager.instance.playPlayerSound("dash");
     }
 
     IEnumerator DashCooldown(){
@@ -331,10 +334,11 @@ public class PlayerManager : MonoBehaviour
 
     private void playerBlock(){
         isBlocking = true;
+        AudioManager.instance.playPlayerSound("shield");
     }
 
     private void OnCollisionEnter2D(Collision2D collider){
-        if(collider.gameObject.layer == 9){ //If player collides with layer 9 ("Enemies")
+        if(collider.gameObject.layer == 9 && isBlocking != true){ //If player collides with layer 9 ("Enemies") and isn't blocking
             if(collider.gameObject.transform.position.x > this.transform.position.x){ //Determine side of which player was hit on to determine direction of knockback
                 playerHurt("right");
             } else{ //collider.gameObject.transform.position.x < this.transform.position.x
@@ -347,6 +351,7 @@ public class PlayerManager : MonoBehaviour
         playerHealth -= 1; //Reduce health by 1
         horizontalMovement = 0f; //Stop all horizontal movement
         isHurt = true; //Enable switching to hurt state
+        AudioManager.instance.playPlayerSound("hurt"); //Playing audio
         
         if(hurtDirection == "right"){
             horizontalMovement = -4.0f;

@@ -95124,6 +95124,11 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 543a2751809e04f4c88f08153d272738, type: 3}
+--- !u!82 &821729184 stripped
+AudioSource:
+  m_CorrespondingSourceObject: {fileID: -3028565726026258265, guid: 543a2751809e04f4c88f08153d272738, type: 3}
+  m_PrefabInstance: {fileID: 821729183}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &897756040
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -95698,6 +95703,7 @@ GameObject:
   - component: {fileID: 1455194532}
   - component: {fileID: 1455194533}
   - component: {fileID: 1455194531}
+  - component: {fileID: 1455194534}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -95748,6 +95754,24 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fe6470d7c1a8249929e0022c2787d548, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &1455194534
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1455194530}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5ccc5622286384d02a4bb91d53b4e73f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  playerAudioSource: {fileID: 821729184}
+  jumpSound: {fileID: 8300000, guid: e1abc3fd32b0f4d70808577ae0fcc049, type: 3}
+  hurtSound: {fileID: 8300000, guid: abd6f599da9d34aa59b098cf9978f527, type: 3}
+  fireSound: {fileID: 8300000, guid: fdd3cc2bd768849da9272c1f7f2b4e52, type: 3}
+  dashSound: {fileID: 8300000, guid: 264c9cde38255408cb83b19dc090912d, type: 3}
+  shieldSound: {fileID: 8300000, guid: 4fdfe57747a754e4cab093aea88df947, type: 3}
 --- !u!1 &1468268171
 GameObject:
   m_ObjectHideFlags: 0
