@@ -75,9 +75,9 @@ public class EnemyPatrol : MonoBehaviour
     void flip()
     {
         Debug.Log("flipping");
-        //Vector3 localScale = transform.localScale;
-        //localScale.x *= -1;
-        //transform.localScale = localScale;
+        Vector3 localScale = transform.localScale;
+        localScale.x *= -1;
+        transform.localScale = localScale;
         rb.velocity = new Vector2 (rb.velocity.x*-1, 0);
     }
 
