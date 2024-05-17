@@ -24,9 +24,10 @@ public class CannonScript : MonoBehaviour
     void Start()
     {
         GameObject tmp;
+        Vector3 spawnPoint = new Vector3(0, 0, 0);
         for (int i = 0; i < amountToPool; i++)
         {
-            tmp = Instantiate(ProjectilePrefab);
+            tmp = Instantiate(ProjectilePrefab, spawnPoint, Quaternion.Euler(0, 0, 0), FirePoint);
             tmp.SetActive(false);
             pooledObjects.Add(tmp);
         }
@@ -55,7 +56,7 @@ public class CannonScript : MonoBehaviour
         lastShoot += Time.deltaTime;
         if (lastShoot >= shootInterval)
         {
-            //Debug.Log("shooting");
+            Debug.Log("shooting");
             GameObject projectile = CannonScript.SharedInstance.GetPooledObject();
             if (projectile != null) {
                 projectile.transform.position = FirePoint.position;
